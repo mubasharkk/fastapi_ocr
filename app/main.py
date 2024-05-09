@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import io
+import os
 import time
 from typing import List
 import pytesseract
@@ -11,13 +12,12 @@ from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 
-import app.utils.image_ocr as ocr
-import app.utils.image_preprocesing as preprocesing
+import utils.image_ocr as ocr
+import utils.image_preprocesing as preprocesing
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="app/templates")
-
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 def home(request: Request):
@@ -26,12 +26,12 @@ def home(request: Request):
 
 @app.get("/image/{image_id}")
 def get_image(image_id: str):
-    return FileResponse(path=f"app/temp/{image_id}.jpg")
+    return FileResponse(path=f"temp/{image_id}")
 
 
 @app.post("/extract_text")
 async def perform_ocr(image: UploadFile = File(...)):
-    temp_file = ocr.save_file(image, path="app/temp", save_as="temp")
+    temp_file = ocr.save_file(image, path="temp", save_as="temp")
     text = await ocr.read_image(temp_file)
     try:
         contents = image.file.read()
@@ -93,7 +93,7 @@ async def extract_text_from_url(url: str):
 
 @app.post("/extract_text_with_language")
 async def extract_text_with_language(image: UploadFile = File(...), language: str = "eng"):
-    temp_file = ocr.save_file(image, path="app/temp", save_as="temp")
+    temp_file = ocr.save_file(image, path="./temp", save_as="temp")
     image = Image.open(temp_file)
     text = pytesseract.image_to_string(image, lang=language)
     return {"text": text}
@@ -103,7 +103,7 @@ async def extract_text_with_language(image: UploadFile = File(...), language: st
 async def search_text_in_images(text_to_search: str, images: List[UploadFile] = File(...)):
     tasks = []
     for img in images:
-        temp_file = ocr.save_file(img, path="app/temp", save_as=img.filename)
+        temp_file = ocr.save_file(img, path="./temp", save_as=img.filename)
         tasks.append(asyncio.create_task(ocr.read_image(temp_file)))
     texts = await asyncio.gather(*tasks)
     for i in range(len(texts)):
@@ -114,7 +114,7 @@ async def search_text_in_images(text_to_search: str, images: List[UploadFile] = 
 
 @app.post("/get_image_with_bounding_boxes")
 async def post_image_with_bounding_boxes(image: UploadFile = File(...)):
-    temp_file = ocr.save_file(image, path="app/temp", save_as="temp")
+    temp_file = ocr.save_file(image, path="./temp", save_as="temp")
     img = preprocesing.get_image_with_bounding_boxes(temp_file)
     img_pil = Image.fromarray(img)
     # Save the image to a BytesIO object
@@ -126,4 +126,4 @@ async def post_image_with_bounding_boxes(image: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)
