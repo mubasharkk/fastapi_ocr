@@ -9,6 +9,7 @@ The microservice also cleans and processes the uploaded images with OpenCV; impr
 - [Python](https://python.org/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tesseract OCR](https://tesseract-ocr.github.io/)
+- [OCRmyPDF](https://github.com/ocrmypdf/OCRmyPDF)
 - [Docker](https://www.docker.com/)
 
 
@@ -19,7 +20,7 @@ The microservice also cleans and processes the uploaded images with OpenCV; impr
 ----------------------------
 ### Clone the repo
 ```angular2html
-git clone https://github.com/Barthomieu/fastapi_ocr.git
+git clone https://github.com/mubasharkk/fastapi_ocr.git
 ```
 
 ### Install dependencies

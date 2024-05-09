@@ -3,6 +3,7 @@ import base64
 import io
 import os
 import time
+import uuid
 from typing import List
 import pytesseract
 import requests
@@ -31,11 +32,11 @@ def get_image(image_id: str):
 
 @app.post("/extract_text")
 async def perform_ocr(image: UploadFile = File(...)):
-    temp_file = ocr.save_file(image, path="temp", save_as="temp")
+    temp_file = ocr.save_file(image, save_as="temp")
     text = await ocr.read_image(temp_file)
     try:
         contents = image.file.read()
-        with open("uploaded_" + image.filename, "wb") as f:
+        with open(f'/tmp/{uuid.uuid4()}_' + image.filename, "wb") as f:
             f.write(contents)
     except Exception:
         return {"message": "There was an error uploading the file"}
