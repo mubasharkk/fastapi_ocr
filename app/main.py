@@ -24,37 +24,20 @@ templates = Jinja2Templates(directory="templates")
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
-@app.get("/image/{image_id}")
-def get_image(image_id: str):
-    return FileResponse(path=f"temp/{image_id}")
-
-
-@app.post("/extract_text")
+@app.post("/extract/text")
 async def perform_ocr(image: UploadFile = File(...)):
-    temp_file = ocr.save_file(image, save_as="temp")
+    temp_file = ocr.save_file(image)
     text = await ocr.read_image(temp_file)
-    try:
-        contents = image.file.read()
-        with open(f'/tmp/{uuid.uuid4()}_' + image.filename, "wb") as f:
-            f.write(contents)
-    except Exception:
-        return {"message": "There was an error uploading the file"}
-    finally:
-        image.file.close()
+    return {"filename": image.filename, "text": text}
 
-    base64_encoded_image = base64.b64encode(contents).decode("utf-8")
-    return {"filename": image.filename, "text": text, "myImage": base64_encoded_image}
-
-
-@app.post("/extract_text_from_many_files")
+@app.post("/extract/multitext")
 async def extract_text(Images: List[UploadFile] = File(...)):
     response = {}
     s = time.time()
     tasks = []
     for img in Images:
         print("Images Uploaded: ", img.filename)
-        temp_file = ocr.save_file(img, path="./", save_as=img.filename)
+        temp_file = ocr.save_file(img)
         tasks.append(asyncio.create_task(ocr.read_image(temp_file)))
     text = await asyncio.gather(*tasks)
     for i in range(len(text)):
@@ -64,9 +47,9 @@ async def extract_text(Images: List[UploadFile] = File(...)):
     return response
 
 
-@app.post("/convert")
+@app.post("/convert/image/text")
 async def post_image_to_text(file: UploadFile = File(...)):
-    img = await ocr.read_img(file, HTTPException(status_code=422, detail="Invalid image"))
+    img = await pytesseract.image_to_pdf_or_hocr(file, HTTPException(status_code=422, detail="Invalid image"))
 
     ocr_predictions: str = ocr.apply_ocr(img)
     print(ocr_predictions)
@@ -77,6 +60,19 @@ async def post_image_to_text(file: UploadFile = File(...)):
             "lines": ocr_predictions.split("\n"),
         }
     }
+
+@app.post("/convert/image/pdf")
+async def post_image_to_pdf(image: UploadFile = File(...)):
+    try:
+        temp_file = ocr.save_file(image)
+        pdf = pytesseract.image_to_pdf_or_hocr(Image.open(temp_file), extension='pdf')
+        temp_file = f'/tmp/{uuid.uuid4()}.pdf'
+        with open(temp_file, 'w+b') as f:
+            f.write(pdf)
+        return FileResponse(path=temp_file)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
 
 
 @app.post("/extract_text_from_url")
@@ -92,19 +88,19 @@ async def extract_text_from_url(url: str):
         raise HTTPException(status_code=422, detail=str(e))
 
 
-@app.post("/extract_text_with_language")
+@app.post("/extract/{language}/text")
 async def extract_text_with_language(image: UploadFile = File(...), language: str = "eng"):
-    temp_file = ocr.save_file(image, path="./temp", save_as="temp")
+    temp_file = ocr.save_file(image)
     image = Image.open(temp_file)
     text = pytesseract.image_to_string(image, lang=language)
     return {"text": text}
 
 
-@app.post("/search_text_in_images/{text_to_search}")
+@app.post("/search/images/{text}")
 async def search_text_in_images(text_to_search: str, images: List[UploadFile] = File(...)):
     tasks = []
     for img in images:
-        temp_file = ocr.save_file(img, path="./temp", save_as=img.filename)
+        temp_file = ocr.save_file(img)
         tasks.append(asyncio.create_task(ocr.read_image(temp_file)))
     texts = await asyncio.gather(*tasks)
     for i in range(len(texts)):

@@ -1,4 +1,5 @@
 import pytesseract
+import uuid
 import os
 import io
 import shutil
@@ -45,9 +46,9 @@ def read_images_from_dir(dir_path, lang='eng', write_to_file=False):
     return converted_text
 
 
-def save_file(uploaded_file, save_as="default"):
+def save_file(uploaded_file):
     extension = os.path.splitext(uploaded_file.filename)[-1]
-    temp_file = os.path.join('/tmp/', save_as + extension)
+    temp_file = os.path.join('/tmp/', str(uuid.uuid4()) + extension)
     with open(temp_file, "wb") as buffer:
         shutil.copyfileobj(uploaded_file.file, buffer)
     return temp_file

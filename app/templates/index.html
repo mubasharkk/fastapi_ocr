@@ -59,7 +59,7 @@
     function performOCR() {
         var files = document.getElementById("image_file").files
         var formData = new FormData();
-        var endpoint = '/extract_text';
+        var endpoint = '/extract/text';
         formData.append('image', files[0])
 
         $.ajax({
