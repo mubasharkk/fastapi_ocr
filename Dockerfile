@@ -1,8 +1,8 @@
 
 FROM python:3.12
 
-COPY ./requirements.txt /requirements.txt
-COPY ./app /var/www/app
+#COPY ./requirements.txt /requirements.txt
+#COPY ./app /var/www/app
 
 RUN apt-get update && \
     apt-get install -y \
@@ -17,10 +17,27 @@ RUN apt-get update && \
         ocrmypdf \
         libgl1 \
         make \
-        gcc \
-    && python3 -m pip install -r /requirements.txt
+        git \
+        autoconf \
+        automake \
+        libtool \
+        pkg-config \
+        libpng-dev \
+        libjpeg-dev \
+        gcc
 
 RUN export PYTHONPATH=$PWD
+
+# Install jbig2 library and its dependencies
+RUN git clone https://github.com/agl/jbig2enc /tmp/jbig2enc
+
+WORKDIR /tmp/jbig2enc
+
+RUN ./autogen.sh
+
+RUN ./configure && make
+
+RUN make install
 
 #WORKDIR /var/www/app
 

@@ -11,3 +11,4 @@ opencv-python
 python-dotenv
 numpy
 requests
+ocrmypdf
