@@ -12,3 +12,6 @@ python-dotenv
 numpy
 requests
 ocrmypdf
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
