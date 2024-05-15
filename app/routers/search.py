@@ -9,14 +9,16 @@ router = APIRouter(
 )
 
 
-@router.post("/images/{text}")
-async def search_text_in_images(text_to_search: str, images: List[UploadFile] = File(...)):
+@router.post("/images")
+async def search_text_in_images(text: str, images: List[UploadFile] = File(...)):
     tasks = []
     for img in images:
         temp_file = ocr_image.save_file(img)
         tasks.append(asyncio.create_task(ocr_image.read_image(temp_file)))
     texts = await asyncio.gather(*tasks)
+    results = []
     for i in range(len(texts)):
-        if text_to_search in texts[i]:
-            return {"status": "found", "text": text_to_search, "file_name": images[i].filename}
-    return {"status": "not found", "text": text_to_search}
+        if text.casefold() in texts[i].casefold():
+            results.append({"search": text, text: texts[i], "file_name": images[i].filename})
+
+    return results
