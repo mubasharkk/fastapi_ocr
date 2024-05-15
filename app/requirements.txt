@@ -2,7 +2,7 @@ Pillow
 pytesseract
 uvicorn
 gunicorn
-fastapi
+fastapi[all]
 wheel
 python-multipart
 jinja2
@@ -16,3 +16,6 @@ python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
 pypdf
+minio
+boto3
+python-decouple

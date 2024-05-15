@@ -2,7 +2,7 @@ import uuid
 import ocrmypdf
 
 
-def convert_pdfa(input_file, lang='eng'):
+def convert_pdfa(input_file: str, lang='eng') -> str:
     output_file = f'/tmp/{uuid.uuid4()}.pdf'
     ocrmypdf.ocr(
         input_file,
@@ -21,3 +21,8 @@ def convert_pdfa(input_file, lang='eng'):
         # skip_text=True
     )
     return output_file
+
+
+def perform_ocr_on_storage_file(key: str, bucket: str):
+    
+    return key
