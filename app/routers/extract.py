@@ -1,13 +1,16 @@
-import utils.image_ocr as ocr_image
+import uuid
+
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException
 import time
 import asyncio
 import requests
 import pytesseract
 import io
-
 from typing import List
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException
 from PIL import Image
+import utils.image_ocr as ocr_image
+import utils.pdf_ocr as ocr_pdf
+from pypdf import PdfReader
 
 router = APIRouter(
     prefix='/v1/extract',
@@ -52,3 +55,13 @@ async def extract_text_from_url(url: str):
         return {"text": text}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
+
+
+@router.post('/pdf')
+async def extract_text_from_pdf(file: UploadFile = File(...)):
+    temp_file = ocr_image.save_file(file)
+    reader = PdfReader(temp_file)
+    pages_text = []
+    for page in reader.pages:
+        pages_text.append(page.extract_text())
+    return {'pages': pages_text}
