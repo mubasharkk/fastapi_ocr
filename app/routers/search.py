@@ -1,11 +1,13 @@
 import modules.utils.image_ocr as ocr_image
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Depends
 from typing import List
 import asyncio
+from middlewares.check_api_token import JWTBearer, check_api_key
 
 router = APIRouter(
     prefix='/v1/search',
     tags=['Search'],
+    dependencies=[Depends(JWTBearer()), Depends(check_api_key)]
 )
 
 

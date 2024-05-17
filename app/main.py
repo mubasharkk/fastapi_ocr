@@ -8,7 +8,6 @@ from modules.storage.storage import Storage
 from fastapi.responses import FileResponse
 import botocore
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from middlewares.check_api_token import JWTBearer, check_api_key
 
 
 app = FastAPI(
@@ -35,8 +34,7 @@ app = FastAPI(
             "name": "Convert",
             "description": "API endpoints to convert files into requested format while applying OCR",
         },
-    ],
-    dependencies=[Depends(JWTBearer()), Depends(check_api_key)]
+    ]
 )
 
 # trusted_hosts = config('TRUSTED_HOSTS').split(',')
@@ -54,6 +52,11 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get('/v1/healthcheck')
+def healthcheck(request: Request):
+    return {'status': 'alive', 'version': '1.0'}
 
 
 @app.get("/test")

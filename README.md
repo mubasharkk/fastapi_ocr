@@ -50,3 +50,13 @@ The api contains the following endpoints
 * #### ```/extract_text``` - returns text from uploaded file
 * #### ```/extract_text_from_many_files``` - return text from all uploades files
 * #### ```/extract_text_from_url``` - return text from url with image
+
+
+## Running Tests
+```shell
+cd /var/www/app
+
+export PYTHONPATH=$PWD
+
+pytest -q tests
+```

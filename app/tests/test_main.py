@@ -5,9 +5,15 @@ from ..main import (app)
 client = TestClient(app)
 
 
-# def test_read_item():
-#     response = client.get("/", headers={"X-Token": "coneofsilence"})
-#     assert response.status_code == 200
+def test_homepage():
+    response = client.get("/")
+    assert response.status_code == 200
+
+
+def test_v1_health_check():
+    response = client.get("/v1/healthcheck")
+    assert response.status_code == 200
+    assert response.json() == {'status': 'alive', 'version': '1.0'}
 
 #
 # def test_read_item_bad_token():

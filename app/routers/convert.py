@@ -4,14 +4,16 @@ import uuid
 import modules.utils.image_ocr as ocr_image
 import modules.utils.pdf_ocr as ocr_pdf
 import modules.utils.image_preprocesing as preprocesing
+from middlewares.check_api_token import JWTBearer, check_api_key
 
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Depends
 from PIL import Image
 from fastapi.responses import StreamingResponse, FileResponse
 
 router = APIRouter(
     prefix='/v1/convert',
-    tags=['Convert']
+    tags=['Convert'],
+    dependencies=[Depends(JWTBearer()), Depends(check_api_key)]
 )
 
 

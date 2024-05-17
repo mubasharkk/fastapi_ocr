@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Depends
 import time
 import asyncio
 import requests
@@ -8,10 +8,12 @@ from typing import List
 from PIL import Image
 import modules.utils.image_ocr as ocr_image
 from pypdf import PdfReader
+from middlewares.check_api_token import JWTBearer, check_api_key
 
 router = APIRouter(
     prefix='/v1/extract',
-    tags=['Extract']
+    tags=['Extract'],
+    dependencies=[Depends(JWTBearer()), Depends(check_api_key)]
 )
 
 
