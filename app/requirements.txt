@@ -20,3 +20,4 @@ minio
 boto3
 python-decouple
 pyjwt
+pytest>=6.2.5

@@ -1,9 +1,9 @@
 import pytesseract
 import io
 import uuid
-import utils.image_ocr as ocr_image
-import utils.pdf_ocr as ocr_pdf
-import utils.image_preprocesing as preprocesing
+import modules.utils.image_ocr as ocr_image
+import modules.utils.pdf_ocr as ocr_pdf
+import modules.utils.image_preprocesing as preprocesing
 
 from fastapi import APIRouter, Request, UploadFile, File, HTTPException
 from PIL import Image

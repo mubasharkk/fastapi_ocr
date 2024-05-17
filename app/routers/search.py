@@ -1,4 +1,4 @@
-import utils.image_ocr as ocr_image
+import modules.utils.image_ocr as ocr_image
 from fastapi import APIRouter, Request, UploadFile, File, HTTPException
 from typing import List
 import asyncio

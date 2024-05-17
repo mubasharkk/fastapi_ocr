@@ -1,5 +1,3 @@
-import uuid
-
 from fastapi import APIRouter, Request, UploadFile, File, HTTPException
 import time
 import asyncio
@@ -8,8 +6,7 @@ import pytesseract
 import io
 from typing import List
 from PIL import Image
-import utils.image_ocr as ocr_image
-import utils.pdf_ocr as ocr_pdf
+import modules.utils.image_ocr as ocr_image
 from pypdf import PdfReader
 
 router = APIRouter(
