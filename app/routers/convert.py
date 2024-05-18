@@ -24,7 +24,11 @@ async def convert_image_to_pdf(image: UploadFile = File(...)):
             ocr_image.save_file(image)
         )
         pdf_pages = []
-        for frame in range(image.n_frames):
+        frames = 1
+        if hasattr(image, 'n_frames'):
+            frames = image.n_frames
+
+        for frame in range(0, frames):
             image.seek(frame)
             pdf = pytesseract.image_to_pdf_or_hocr(image, extension='pdf', config=r'--oem 3 --psm 6')
             temp_file = f'/tmp/{uuid.uuid4()}.pdf'
