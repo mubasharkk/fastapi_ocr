@@ -67,5 +67,13 @@ async def test(file: str):
     except botocore.exceptions.ClientError as ex:
         return ex.response['Error']
 
+
+@app.exception_handler(Exception)
+async def http_exception_handler(request, exc):
+    raise HTTPException(
+        status_code=501,
+        detail="Server unable to process the request"
+    )
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=80)

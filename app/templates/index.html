@@ -25,7 +25,7 @@
 
     <div class="mb-3">
         <label for="image_file" class="form-label">Select an Image</label>
-        <input class="form-control" type="file" id="image_file" name="myfile" multiple>
+        <input class="form-control" type="file" id="image_file" name="myfile" multiple accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps,image/tiff">
     </div>
     <div class="mb-3">
         <button class="btn btn-success" onclick="performOCR()">Process</button>
@@ -59,19 +59,39 @@
     function performOCR() {
         var files = document.getElementById("image_file").files
         var formData = new FormData();
-        var endpoint = '/extract/text';
-        formData.append('image', files[0])
+        // formData.append('images', $('#image_file')[0].files)
+
+        var endpoint = '/v1/extract/text';
+
+        $.each($('#image_file')[0].files, function (i, file) {
+             if (file.type === 'application/pdf') {
+                endpoint = '/v1/extract/pdf'
+                formData.append('file', file);
+            } else {
+                formData.append('images', file);
+            }
+        });
+
+        endpoint = endpoint + '?api_key=b65f8c8dc11f4c35a00f39dd3a7c96a0';
 
         $.ajax({
+            method: 'POST',
             type: 'POST',
             url: endpoint,
             data: formData,
+            headers: {'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiYjY1ZjhjOGRjMTFmNGMzNWEwMGYzOWRkM2E3Yzk2YTAifQ.4X4maVN7wyWvjW3JpA_ylgmCGNc6rQibW1F-8JmmaHE'},
             contentType: false,
             cache: false,
             processData: false,
             success: function (data) {
-                <!--swal("Odczytany tekst", data.text);-->
-                $("#resultTextarea1").val(data.text);
+                displayWindow = $("#resultTextarea1");
+                displayWindow.val('')
+                $.each(data.files, function (key, content) {
+                    displayWindow.val(displayWindow.val() + "\n\n\n--------- Image: " + key + "\n\n\n"  + content);
+                });
+                $.each(data.pages, function (key, content) {
+                    displayWindow.val(displayWindow.val() + "\n\n\n--------- Page: " + (key+1) + "\n\n\n" + content);
+                });
             }
         });
 

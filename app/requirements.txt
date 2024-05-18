@@ -21,3 +21,5 @@ boto3
 python-decouple
 pyjwt
 pytest>=6.2.5
+sqlalchemy
+PyPDF2
