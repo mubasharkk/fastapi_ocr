@@ -7,12 +7,9 @@ from PIL import Image
 from numpy import asarray, ndarray
 from fastapi import UploadFile
 from .image_preprocesing import denoise_img, blur_img, convert_to_grayscale, resize_img
-# import pyocr
-# import pyocr.builders
 
-# pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
 
-async def read_image(img_path, lang='eng'):
+async def read_image(imageFile, lang='eng'):
     """
     Performs OCR on a single image
     :img_path: str, path to the image file
@@ -22,15 +19,19 @@ async def read_image(img_path, lang='eng'):
     """
 
     try:
-        image = Image.open(img_path)
+        image = Image.open(imageFile)
         text = ""
-        for frame in range(image.n_frames):
+        frames = 0
+        if hasattr(image, 'n_frames'):
+            frames = image.n_frames
+
+        for frame in range(0, frames):
             image.seek(frame)
             text += pytesseract.image_to_string(image, lang=lang)
-            text += "\n\n\n"
+            text += "\n---\n"
         return text
     except:
-        return "[ERROR] Unable to process file: {0}".format(img_path)
+        return "[ERROR] Unable to process file: {0}".format(imageFile)
 
 
 def read_images_from_dir(dir_path, lang='eng', write_to_file=False):

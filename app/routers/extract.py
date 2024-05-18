@@ -49,8 +49,7 @@ async def extract_text_from_url(url: str):
         response = requests.get(url)
         if response.status_code != 200:
             raise HTTPException(status_code=422, detail="Invalid image URL")
-        image = Image.open(io.BytesIO(response.content))
-        text = pytesseract.image_to_string(image)
+        text = ocr_image.read_image(io.BytesIO(response.content))
         return {"text": text}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
